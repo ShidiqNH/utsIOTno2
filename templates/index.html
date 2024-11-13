@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #262626;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        h1 {
+            color: #FFFFFF;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h3 {
+            color: #000000;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .section-header {
+            background-color: #d9d9d9;
+            color: #fff;
+            padding: 10px 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
+        }
+        .section-header i {
+            margin-right: 10px;
+        }
+        .section-content {
+            padding: 15px;
+            color: #333;
+        }
+        .section-content p {
+            font-size: 1em;
+            margin: 5px 0;
+        }
+        .section-content p span {
+            font-weight: bold;
+        }
+        .section-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .section-content ul li {
+            background-color: #f9f9f9;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            font-size: 0.95em;
+        }
+        .section-content ul li i {
+            color: #000000;
+            margin-right: 10px;
+        }
+        
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Sensor Data</h1>
+    <h1>Shidiq NH - 152022016</h1>
+    <div class="section">
+        <div class="section-header">
+            <h3 class="header-title">Suhu</h3>
+        </div>
+        <div class="section-content">
+            <p><i class="fas fa-temperature-high"></i> Suhu Maksimum: <span id="suhuMax"></span>°C</p>
+            <p><i class="fas fa-temperature-low"></i> Suhu Minimum: <span id="suhuMin"></span>°C</p>
+            <p><i class="fas fa-chart-line"></i> Suhu Rata-rata: <span id="suhuRata"></span>°C</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <h3 class="header-title">Nilai Suhu & Kelembaban Maksimum</h3>
+        </div>
+        <div class="section-content">
+            <ul id="suhuKelembabanMaxList"></ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <h3 class="header-title">Bulan & Tahun Maksimum</h3>
+        </div>
+        <div class="section-content">
+            <ul id="bulanTahunMaxList"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function fetchData() {
+        try {
+            const response = await fetch('/api/data');
+            const data = await response.json();
+
+            // Display Informasi Suhu
+            document.getElementById("suhuMax").textContent = data.suhumax;
+            document.getElementById("suhuMin").textContent = data.suhumin;
+            document.getElementById("suhuRata").textContent = data.suhurata;
+
+            // Populate Suhu & Kelembaban Max List
+            const suhuKelembabanMaxList = document.getElementById("suhuKelembabanMaxList");
+            data.nilai_suhu_max_humid_max.forEach(item => {
+                const listItem = document.createElement("li");
+                listItem.innerHTML = `<i class="fas fa-info-circle"></i> ID: ${item.idx}, Suhu: ${item.suhu}°C, Humid: ${item.humid}%, Kecerahan: ${item.kecerahan} lux, Timestamp: ${item.timestamp}`;
+                suhuKelembabanMaxList.appendChild(listItem);
+            });
+
+            // Populate Bulan Tahun Max List
+            const bulanTahunMaxList = document.getElementById("bulanTahunMaxList");
+            data.month_year_max.forEach(monthYear => {
+                const listItem = document.createElement("li");
+                listItem.innerHTML = `<i class="fas fa-calendar-day"></i> ${monthYear.month_year}`;
+                bulanTahunMaxList.appendChild(listItem);
+            });
+
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
+
+    // Fetch data on page load
+    window.onload = fetchData;
+</script>
+
+</body>
+</html>
